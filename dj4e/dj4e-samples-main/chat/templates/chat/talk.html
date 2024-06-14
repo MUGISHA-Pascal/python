@@ -1,0 +1,41 @@
+{% extends 'base_bootstrap.html' %}
+{% block content %}
+<h1>Chat</h1>
+<form method="post">
+{% csrf_token %}
+<input type="text" name="message" size="60"/>
+<input type="submit" value="Post"/>
+</p>
+</form>
+
+<div id="chatcontent">
+<img src="{% url 'chat:static' 'spinner.gif' %}" alt="Loading..."/>
+</div>
+
+<script type="text/javascript">
+async function updateMsg() {
+    console.log('Requesting JSON');
+
+    fetch("{% url 'chat:messages' %}", {cache: "no-store"})
+      .then((response) => response.json())
+      .then((rowz) => {
+        console.log('JSON data', rowz);
+        document.getElementById('chatcontent').innerHTML = "";
+        for (var i = 0; i < rowz.length; i++) {
+            arow = rowz[i];
+            document.getElementById('chatcontent').innerHTML +=
+                '<p>'+arow[0] + '<br/>&nbsp;&nbsp;'+arow[1]+"</p>\n";
+        }
+        setTimeout('updateMsg()', 4000);
+      })
+      .catch((error) => {
+          alert(error);
+      });
+
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+    setTimeout('updateMsg()', 2000);
+});
+</script>
+{% endblock %}
